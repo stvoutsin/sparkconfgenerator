@@ -31,10 +31,4 @@ jobs:
         poetry install --with dev
 
     - name: Run tests
-      run: poetry run pytest
-
-    - name: Install dependencies
-      run: poetry install
-
-    - name: Run tests
-      run: poetry run pytest
+      run: python -m unittest discover tests
