@@ -1,0 +1,2 @@
+# sparkconfgenerator
+Spark Properties generator
