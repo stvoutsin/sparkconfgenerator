@@ -1,3 +1,5 @@
+from typing import Any
+
 from sparkconfgenerator.models import (
     VirtualMachine,
     SparkProperties,
@@ -42,6 +44,16 @@ class SparkConfGenerator:
             num_worker_instances=self.num_worker_instances,
         )
 
+    @staticmethod
+    def get_enum_val(value: str, enum_obj) -> Any:
+        try:
+            enum_entry = next(
+                mode for mode in enum_obj if mode.value.upper() == value.upper()
+            )
+        except StopIteration:
+            raise ValueError(f"No matching enum_obj for {value}")
+        return enum_entry
+
     def get_as_spark_props(self) -> str:
         return f"""
         spark.master    yarn
@@ -55,8 +67,12 @@ class SparkConfGenerator:
         spark.default.parallelism    {self.properties.default_parallelism}
         spark.yarn.am.memory    {self.properties.yarn_am_memory}m
         spark.yarn.am.cores    {self.properties.yarn_am_cores}
-        spark.dynamicAllocation.enabled    {str(self.properties.dynamic_allocation).lower()}
-        spark.shuffle.service.enabled    {str(self.properties.shuffle_service_enabled).lower()}
+        spark.dynamicAllocation.enabled    {
+        str(self.properties.dynamic_allocation).lower()
+        }
+        spark.shuffle.service.enabled    {
+        str(self.properties.shuffle_service_enabled).lower()
+        }
         spark.dynamicAllocation.minExecutors    {self.properties.min_executors}
         spark.dynamicAllocation.maxExecutors    {self.properties.max_executors}
         spark.dynamicAllocation.initialExecutors    {self.properties.initial_executors}

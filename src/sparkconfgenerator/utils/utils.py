@@ -3,10 +3,11 @@ class Utils:
     used for things like byte conversion"""
 
     @staticmethod
-    def gb_to_mb(func):
-        """Decorator method, used to onvert gb to mb"""
+    def gb_to_mb(memory: int) -> int:
+        """Convert gb to mb"""
+        return memory * 1024
 
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs) * 1024
-
-        return wrapper
+    @staticmethod
+    def mb_to_gb(memory: int) -> int:
+        """Convert mb to gb"""
+        return memory // 1024

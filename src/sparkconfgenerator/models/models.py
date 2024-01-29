@@ -1,7 +1,13 @@
 from dataclasses import dataclass
 import math
-from ..utils import Utils
-from enum import Enum, auto
+from enum import Enum
+
+from sparkconfgenerator.utils import Utils
+
+
+class Unit(Enum):
+    GB = "GB"
+    MB = "MB"
 
 
 @dataclass
@@ -9,11 +15,13 @@ class VirtualMachine:
     """Virtual Machine specs
     Args:
         cores (int, required): Number of cores
-        memory (int, required): Memory in GB
+        memory (int, required): Memory
+        unit (Unit, default(Unit.GB)): Units of memory
     """
 
     cores: int
     memory: int
+    unit: Unit = Unit.GB
 
 
 class SparkPropertiesClient:
@@ -36,12 +44,19 @@ class SparkPropertiesClient:
     ):
         self.num_instances = num_worker_instances
         self.worker_vm_cores = worker_instance.cores
-        self.worker_vm_memory = worker_instance.memory
+        self.worker_vm_memory = (
+            worker_instance.memory
+            if (worker_instance.unit is Unit.MB)
+            else Utils.gb_to_mb(worker_instance.memory)
+        )
         self.driver_vm_cores = driver_instance.cores
-        self.driver_vm_memory = driver_instance.memory
+        self.driver_vm_memory = (
+            driver_instance.memory
+            if (driver_instance.unit is Unit.MB)
+            else Utils.gb_to_mb(driver_instance.memory)
+        )
 
     @property
-    @Utils.gb_to_mb
     def driver_memory(self) -> int:
         return math.floor(self.driver_vm_memory * 0.67)
 
@@ -50,7 +65,6 @@ class SparkPropertiesClient:
         return min(self.driver_vm_cores, 5)
 
     @property
-    @Utils.gb_to_mb
     def driver_memory_overhead(self) -> int:
         return math.ceil(self.driver_vm_memory * 0.1)
 
@@ -60,15 +74,15 @@ class SparkPropertiesClient:
 
     @property
     def total_executor_memory(self):
-        return math.floor((self.worker_vm_memory - 1) / self.executor_per_node)
+        mem = math.floor((self.worker_vm_memory - 1024) / self.executor_per_node)
+        return mem
 
     @property
-    @Utils.gb_to_mb
     def executor_memory(self) -> int:
-        return math.floor(self.total_executor_memory * 0.9)
+        mem = math.floor(self.total_executor_memory * 0.9)
+        return mem
 
     @property
-    @Utils.gb_to_mb
     def executor_memory_overhead(self) -> int:
         return math.ceil(self.total_executor_memory * 0.1)
 
@@ -132,5 +146,5 @@ class SparkPropertiesClient:
 class DeployMode(Enum):
     """Deploy Mode for Spark (Client or Cluster)"""
 
-    CLIENT = auto()
-    CLUSTER = auto()
+    CLIENT = "CLIENT"
+    CLUSTER = "CLUSTER"

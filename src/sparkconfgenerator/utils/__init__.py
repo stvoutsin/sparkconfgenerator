@@ -1,3 +1,3 @@
 from .utils import Utils
 
-__all__ = [Utils]
+__all__ = ["Utils"]
