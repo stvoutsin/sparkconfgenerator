@@ -4,14 +4,14 @@ from sparkconfgenerator.models import VirtualMachine, Unit
 
 class TestSparkConfGenerator:
     def test_generator_properties(self) -> None:
-        properties = SparkConfGenerator(
+        generator = SparkConfGenerator(
             driver_instance=VirtualMachine(cores=54, memory=86, unit=Unit.GB),
             worker_instance=VirtualMachine(cores=26, memory=43, unit=Unit.GB),
             dynamic_allocation=True,
             num_worker_instances=6,
             deploy_mode=DeployMode.CLIENT,
         )
-        properties = properties.properties
+        properties = generator.properties  # type: ignore
 
         assert properties.driver_memory == 59002
         assert properties.driver_memory_overhead == 8807
