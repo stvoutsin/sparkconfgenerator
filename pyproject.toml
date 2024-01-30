@@ -6,7 +6,7 @@ authors = ["Stelios Voutsinas <stv@roe.ac.uk>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 pytest = "^7.4.3"
 click = "^8.1.7"
 
